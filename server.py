@@ -25,6 +25,9 @@ class JSONEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, o)
 
 
+@app.route('/', methods=['GET'])
+def home():
+ return '<h1> Welcome to my aapi<h1>'
 
 
 
