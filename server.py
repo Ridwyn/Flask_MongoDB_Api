@@ -42,7 +42,7 @@ def get_employees():
 
 
 # MAKE A POST TO THE API
-@app.route('/api/addemployee', methods=['POST'])
+@app.route('/api/add', methods=['POST'])
 def add_employee():
     # Get  new employee details
     firstname= request.json['firstname']
@@ -57,7 +57,7 @@ def add_employee():
 
 
 # GET SINGLE EMPLOYEE ROUTE
-@app.route('/api/getemployee/<string:id>', methods=['GET'])
+@app.route('/api/get/<string:id>', methods=['GET'])
 def get_employee(id):
     
     employee= mongo.db.Employees.find_one({'_id':ObjectId(id)})
