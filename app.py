@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS, cross_origin
 from os import environ
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
@@ -8,6 +9,8 @@ import sys
 # Init servver
 
 app = Flask(__name__)
+cors = CORS(app)
+
 
 # set an environment varible 
 app.config['NAME'] = environ.get('USERNAME')
@@ -24,10 +27,6 @@ class JSONEncoder(json.JSONEncoder):
             return str(o)
         return json.JSONEncoder.default(self, o)
 
-
-@app.route('/', methods=['GET'])
-def home():
- return '<h1> Welcome to my aapi<h1>'
 
 
 
