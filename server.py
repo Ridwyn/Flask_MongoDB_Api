@@ -17,7 +17,7 @@ app.config['KEY'] = environ.get('PASSWORD')
 # Configure MongoDB
 mongo = PyMongo(app, uri='mongodb+srv://'+app.config['NAME']+':'+app.config['KEY']+'@rscluster-6us0v.mongodb.net/FlaskEmployeeApi?retryWrites=true')
 
-# Setting JSOnEncoder to decode and encode JSON
+# Setting JSOnEncoder to decode and encode JSON for BSONobjectID
 class JSONEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, ObjectId):
@@ -28,17 +28,56 @@ class JSONEncoder(json.JSONEncoder):
 
 
 
-# Checking for db
-@app.route('/')
+# Api Request of All  Employees
+@app.route('/api/employees', methods=['GET'])
 def get_employees():
     employees=[]
+    # Collect data  from database
     employeesResult = mongo.db.Employees.find()
+    # put data in a python dictionary 
     for employee in employeesResult:
         employees.append(employee)
-        # print(employee, file=sys.stderr)
+        # print(employee, file=sys.stderr)  
+    return  JSONEncoder().encode(employees)
 
+
+# MAKE A POST TO THE API
+@app.route('/api/addemployee', methods=['POST'])
+def add_employee():
+    # Get  new employee details
+    firstname= request.json['firstname']
+    lastname=request.json['lastname']
+    role=request.json['role']
+    department=request.json['department']
+
+    # Perform an insert into the database
+    new_employee = mongo.db.Employees.insert({'firstname':firstname, 'lastname':lastname, 'role':role, 'department': department})
+
+    return  JSONEncoder().encode(new_employee)
+
+
+# GET SINGLE EMPLOYEE ROUTE
+@app.route('/api/getemployee/<string:id>', methods=['GET'])
+def get_employee(id):
     
-    return JSONEncoder().encode(employees)
+    employee= mongo.db.Employees.find_one({'_id':ObjectId(id)})
+    return  JSONEncoder().encode(employee)
+   
+
+# DELETE SINGLE EMPLOYEE ROUTE
+@app.route('/api/delete/<string:id>', methods=['DELETE'])
+def delete_employee(id):    
+    employee= mongo.db.Employees.delete_one({'_id':ObjectId(id)})
+    # Get all employees and retrun 
+    employees=[]
+    # Collect data  from database
+    employeesResult = mongo.db.Employees.find()
+    # put data in a python dictionary 
+    for employee in employeesResult:
+        employees.append(employee)
+    return  JSONEncoder().encode( employees)
+
+
 
 
 
