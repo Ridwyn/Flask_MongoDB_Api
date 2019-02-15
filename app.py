@@ -4,6 +4,7 @@ from os import environ
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 import json
+import datetime
 import sys
 
 # Init servver
@@ -51,9 +52,10 @@ def add_employee():
     lastname=request.json['lastname']
     role=request.json['role']
     department=request.json['department']
+    created_on= datetime.datetime.utcnow().strftime('%m/%d/%Y %H:%M:%S %Z')
 
     # Perform an insert into the database
-    new_employee = mongo.db.Employees.insert({'firstname':firstname, 'lastname':lastname, 'role':role, 'department': department})
+    new_employee = mongo.db.Employees.insert({'firstname':firstname, 'lastname':lastname, 'role':role, 'department': department, 'created_on':created_on})
 
     return  JSONEncoder().encode(new_employee)
 
@@ -79,8 +81,22 @@ def delete_employee(id):
         employees.append(employee)
     return  JSONEncoder().encode( employees)
 
+# CREATE AN UPDATE ROUTE
+@app.route('/api/update/<string:id>', methods=['PUT'])
+def update_employee(id):
 
+    # Get  new employee details
+    firstname= request.json['firstname']
+    lastname=request.json['lastname']
+    role=request.json['role']
+    department=request.json['department']
+    modified_on= datetime.datetime.utcnow().strftime('%m/%d/%Y %H:%M:%S %Z')
 
+    employee= mongo.db.Employees.update_one({'_id':ObjectId(id)},{'$set':{'firstname':firstname, 'lastname':lastname, 'role':role, 'department':department,'modified_on':modified_on}})
+
+    employee_update = mongo.db.Employees.find_one({'_id':ObjectId(id)})
+
+    return JSONEncoder().encode( employee_update)
 
 
 
